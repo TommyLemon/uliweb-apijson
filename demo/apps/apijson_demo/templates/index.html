@@ -45,6 +45,19 @@
         </i-col>
     </Row>
 
+    <Row v-if="tab_current==='tab_put'">
+        <i-col span="3"><div align="center">PUT URL</div></i-col>
+        <i-col span="8"><i-input value="/apijson/put" readonly/></i-col>
+    </Row>
+<Row v-if="tab_current==='tab_put'">
+    <i-col span="3"><div align="center"><strong>apijson put</strong> request examples</div></i-col>
+    <i-col span="8">
+        <i-select v-model="request_data">
+            <i-option v-for="item in request_put" :value="item.value" :key="item.value">{ item.label }</i-option>
+        </i-select>
+    </i-col>
+</Row>
+
     <Row>
         <i-col span="3"><div align="center">request data</div></i-col>
         <i-col span="8"><i-input v-model="request_data" type="textarea" :autosize="{minRows: 3,maxRows: 15}" placeholder="request data" /></i-col>
@@ -62,13 +75,15 @@ var vm = new Vue({
     data: {
         request_get : {{=request_get_json}},
         request_post : {{=request_post_json}},
+        request_put : {{=request_put_json}},
         request_data : "",
         can_post : true,
         response_data : "",
         tab_current : "tab_get",
         tab2url : {
             "tab_get":"{{=url_for('uliweb_apijson.apijson.views.ApiJson.get')}}",
-            "tab_post":"{{=url_for('uliweb_apijson.apijson.views.ApiJson.post')}}"
+            "tab_post":"{{=url_for('uliweb_apijson.apijson.views.ApiJson.post')}}",
+            "tab_put":"{{=url_for('uliweb_apijson.apijson.views.ApiJson.put')}}"
         }
     },
     methods: {
@@ -82,7 +97,7 @@ var vm = new Vue({
                 url: vm.tab2url[vm.tab_current],
                 data: vm.request_data,
                 success: function (data) {
-                    vm.response_data = JSON.stringify(data,null,2)
+                    vm.response_data = JSON.stringify(data,null,4)
                     vm.can_post = false
                 }
             })
@@ -94,6 +109,18 @@ var vm = new Vue({
     watch: {
         request_data : function(n,o){
             vm.can_post = true
+        },
+        tab_current : function(n,o){
+            if (n=="tab_get") {
+                vm.request_data = vm.request_get[0].value
+            }
+            else if (n=="tab_post") {
+                vm.request_data = vm.request_post[0].value
+            }
+            else if (n=="tab_put") {
+                vm.request_data = vm.request_put[0].value
+            }
+            vm.response_data = ""
         }
     }
 })
